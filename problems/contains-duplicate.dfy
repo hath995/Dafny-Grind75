@@ -14,7 +14,7 @@ function containsDuplicate(nums: number[]): boolean {
     return false;
 };
 */
-function method seqSet(nums: seq<int>, index: nat): set<int> {
+function seqSet(nums: seq<int>, index: nat): set<int> {
     set x | 0 <= x < index < |nums| :: nums[x]
 }
 

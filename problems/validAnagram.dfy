@@ -7,11 +7,9 @@ method toMultiset(s: string) returns (mset: multiset<char>)
         invariant mset == multiset(s[0..i])
     {
         assert s == s[0..i] + [s[i]] + s[(i+1)..];
-        // assert multiset(s) == multiset(s[0..i])+multiset{s[i]}+multiset(s[(i+1)..]);
         mset := mset + multiset{s[i]};
     }
     assert s == s[0..|s|];
-    // assert mset == multiset(s[0..|s|]);
     return mset;
 }
 
@@ -31,14 +29,9 @@ method msetEqual(s: multiset<char>, t: multiset<char>) returns (equal: bool)
            return false; 
         }
         var removed := multiset{};
-        // assert removed[x := s[x]] <= s;
         sremoved := sremoved + removed[x := s[x]];
         scopy := scopy - removed[x := s[x]];
     }
-    // assert scopy == multiset{};
-    // assert s - sremoved == scopy;
-    // assert sremoved == s;
-    // assert forall x :: x in sremoved ==> x in s && x in t && t[x] == s[x];
 
     ghost var tremoved: multiset<char> := multiset{};
     var tcopy := t;
@@ -56,7 +49,6 @@ method msetEqual(s: multiset<char>, t: multiset<char>) returns (equal: bool)
         tremoved := tremoved + removed[x := s[x]];
         tcopy := tcopy - removed[x := s[x]];
     }
-    // assert forall x :: x in tremoved ==> x in s && x in t && t[x] == s[x];
 
     return true;
 }
