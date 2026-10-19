@@ -18,19 +18,49 @@ function seqSet(nums: seq<int>, index: nat): set<int> {
     set x | 0 <= x < index < |nums| :: nums[x]
 }
 
-method containsDuplicateI(nums: seq<int>) returns (containsDuplicate: bool)
-    ensures containsDuplicate ==>  exists i,j :: 0 <= i < j < |nums| && nums[i] == nums[j]
+predicate hasDuplicate(s : seq<int>)
 {
-    var windowSet: set<int> := {};
-    for i:= 0 to |nums| 
-        invariant forall x :: x in windowSet ==> x in nums[0..i]
-    {
-        if nums[i] in windowSet {
-            return true;
-        }
-        windowSet := windowSet + {nums[i]};
-    }
-    return false;
+	exists i,j :: 0 <= i < j < |s| && s[i] == s[j]
+}
+
+lemma AppendingUniqueElement(s : seq<int>, a : int)
+	requires !hasDuplicate(s)
+	requires forall j :: 0 <= j < |s| ==> a != s[j]
+	ensures !hasDuplicate(s + [a])
+{
+	
+}
+
+method containsDuplicateI(s : seq<int>)
+		returns (b : bool)
+	ensures hasDuplicate(s) ==> b
+	ensures b ==> hasDuplicate(s)
+{
+	b := false;
+	var i := 0;
+	var elems: set<int> := {};
+
+	while i != |s|
+		invariant 0 <= i <= |s|
+		invariant forall j :: 0 <= j < i ==> s[j] in elems
+		invariant forall el :: el in elems ==> (exists h :: 0 <= h < i && s[h] == el)
+		invariant !hasDuplicate(s[0..i])
+	{
+		if s[i] in elems {
+			b := true;
+			assert hasDuplicate(s[0..i+1]);
+			break;
+		}
+		assert !(s[i] in elems);
+		ghost var elems' := elems;
+		elems := elems + {s[i]};
+		ghost var i' := i;
+		i := i + 1;
+		
+		assert !hasDuplicate(s[0..i']);
+		assert forall j :: 0 <= j < i' ==> s[j] != s[i'];
+		assert !hasDuplicate(s[0..i]);
+	}
 }
 
 /*
